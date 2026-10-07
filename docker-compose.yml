@@ -1,0 +1,21 @@
+services:
+  postgres:
+    # pgvector-enabled Postgres (same instance as domain metadata)
+    image: pgvector/pgvector:pg16
+    container_name: vcs-postgres
+    environment:
+      POSTGRES_USER: vcs
+      POSTGRES_PASSWORD: vcs
+      POSTGRES_DB: vcs
+    ports:
+      - "5432:5432"
+    volumes:
+      - vcs_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vcs -d vcs"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  vcs_postgres_data:
