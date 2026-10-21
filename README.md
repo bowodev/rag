@@ -30,10 +30,12 @@ Start here: [`docs/README.md`](./docs/README.md)
 
 Locked product spec: [`docs/application-spec.md`](./docs/application-spec.md)
 
-## Cursor skills
+## OpenCode skills
 
 - `ngoding-backend`
 - `ngoding-dashboard`
 - `ngoding-chatbot`
 
-Shared workflow: `.cursor/skills/ngoding-shared/workflow.md` (Observation → Planning → Implementation).
+Shared workflow: `.opencode/skills/ngoding-shared/workflow.md` (Observation → Planning → Implementation).
+
+Cursor copies remain in `.cursor/skills/` for compatibility.
