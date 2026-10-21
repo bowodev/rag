@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| Status | `todo` |
+| Status | `done` |
 | Priority | P0 |
 | App | `backend` |
 | Domains | Bot |
@@ -34,7 +34,13 @@ Serializers / OpenAPI schemas for these routes must **omit** all LLM settings. C
 
 ## Acceptance criteria
 
-- [ ] User only sees bots in their tenant(s)
-- [ ] Bot detail JSON contains no prompt/model/temperature (or equivalent)
-- [ ] Accessing another tenant’s bot returns not found / forbidden
-- [ ] Empty tenant returns empty list (not error)
+- [x] User only sees bots in their tenant(s)
+- [x] Bot detail JSON contains no prompt/model/temperature (or equivalent)
+- [x] Accessing another tenant’s bot returns not found / forbidden
+- [x] Empty tenant returns empty list (not error)
+
+## Decisions
+
+- `GET /bots` lists bots across **all** membership tenants (no `tenant_id` query)
+- Cross-tenant / missing bot → **403** (same as VCS-005 upload)
+- All statuses (`draft` / `live` / `disabled`); include `created_at` / `updated_at`

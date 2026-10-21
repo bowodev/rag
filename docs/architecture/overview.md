@@ -84,7 +84,8 @@ Do not close long-lived deps while requests may still be using them.
 | Auth + `/me` + membership-scoped tenants | Done (VCS-002) |
 | Internal user/tenant/membership CRUD + set-password | Done (VCS-003) |
 | Knowledge upload + enqueue (+ recovery/DLQ) | Done (VCS-005) |
-| Bots read / indexing consumer / chat / dashboard | Planned (VCS-004, VCS-006…) |
+| Bots read APIs (metadata only) | Done (VCS-004) |
+| Indexing consumer / chat / dashboard | Planned (VCS-006…) |
 | Host chatbot / embed | Deferred (P2) |
 
 Chatbot host integration is **P2** and intentionally omitted from the MVP critical path.

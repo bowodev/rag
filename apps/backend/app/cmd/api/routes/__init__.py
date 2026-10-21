@@ -1,4 +1,4 @@
-from app.cmd.api.routes import auth, bots_sources, health, me, tenants
+from app.cmd.api.routes import auth, bots, bots_sources, health, me, tenants
 from app.cmd.api.routes.internal import router as internal_router
 from fastapi import APIRouter
 
@@ -7,5 +7,6 @@ api_router.include_router(health.router)
 api_router.include_router(auth.router)
 api_router.include_router(me.router)
 api_router.include_router(tenants.router)
+api_router.include_router(bots.router)
 api_router.include_router(bots_sources.router)
 api_router.include_router(internal_router)

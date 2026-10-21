@@ -16,6 +16,11 @@ uv run pytest tests/test_vcs001_smoke.py
 Env (see `.env.example`): `DATABASE_URL`, `EMBEDDING_DIMENSION` (default 1536),
 S3/MinIO (`S3_*`), JWT, RabbitMQ knowledge queues.
 
+## Bots read (VCS-004)
+
+- `GET /bots` — membership-scoped list (all statuses; metadata only)
+- `GET /bots/{bot_id}` — metadata only; cross-tenant / missing → 403
+
 ## Knowledge upload (VCS-005)
 
 - `POST /bots/{bot_id}/sources` — multipart file (PDF/TXT/DOCX, ≤10 MB)
