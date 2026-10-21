@@ -15,7 +15,7 @@ Architecture KB: [`docs/architecture/overview.md`](./docs/architecture/overview.
 
 ## Local infrastructure
 
-Postgres (**pgvector**) + RabbitMQ via Compose:
+Postgres (**pgvector**) + RabbitMQ + MinIO (Chainguard free image) via Compose:
 
 ```bash
 make infra-up

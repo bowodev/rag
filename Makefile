@@ -8,7 +8,7 @@ API_PORT := 8000
 
 help:
 	@echo "Infra"
-	@echo "  make infra-up       Start Postgres + RabbitMQ"
+	@echo "  make infra-up       Start Postgres + RabbitMQ + MinIO"
 	@echo "  make infra-down     Stop infra"
 	@echo "  make infra-ps       Show infra status"
 	@echo "  make infra-logs     Tail infra logs"
@@ -16,8 +16,10 @@ help:
 	@echo "Backend"
 	@echo "  make backend-install   Install Python deps (uv)"
 	@echo "  make backend-api       Run FastAPI (reload)"
-	@echo "  make backend-consumer  Run RabbitMQ consumer (default: test)"
-	@echo "  make backend-consumer-list  List available consumers"
+	@echo "  make backend-consumer-test       Run test consumer"
+	@echo "  make backend-consumer-dlq        Run knowledge DLQ consumer"
+	@echo "  make backend-consumer-recovery   Run stuck-source recovery consumer"
+	@echo "  make backend-consumer-list       List available consumers"
 	@echo "  make backend-test      Run pytest"
 	@echo "  make publish-test      POST /test-publish smoke"
 
@@ -41,6 +43,12 @@ backend-api:
 
 backend-consumer-test:
 	cd $(BACKEND_DIR) && uv run python -m app.cmd.consumer.main test
+
+backend-consumer-dlq:
+	cd $(BACKEND_DIR) && uv run python -m app.cmd.consumer.main knowledge-dlq
+
+backend-consumer-recovery:
+	cd $(BACKEND_DIR) && uv run python -m app.cmd.consumer.main knowledge-recovery
 
 backend-consumer-list:
 	cd $(BACKEND_DIR) && uv run python -m app.cmd.consumer.main --list

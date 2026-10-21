@@ -1,0 +1,15 @@
+from typing import Protocol
+
+
+class ObjectStorage(Protocol):
+    async def ensure_bucket(self) -> None: ...
+
+    async def put(
+        self,
+        *,
+        key: str,
+        body: bytes,
+        content_type: str,
+    ) -> None: ...
+
+    async def delete(self, *, key: str) -> None: ...

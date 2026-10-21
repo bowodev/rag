@@ -48,5 +48,21 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  # Free community MinIO (Chainguard). Official minio/minio Hub images are source-only now.
+  minio:
+    image: cgr.dev/chainguard/minio:latest
+    container_name: vcs-minio
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: vcs
+      MINIO_ROOT_PASSWORD: vcschangeme
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # Console
+    volumes:
+      - vcs_minio_data:/data
+    restart: unless-stopped
+
 volumes:
   vcs_postgres_data:
+  vcs_minio_data:

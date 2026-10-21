@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| Status | `todo` |
+| Status | `done` |
 | Priority | P0 |
 | App | `backend` |
 | Domains | Knowledge |
@@ -32,11 +32,15 @@ Authenticated users can upload a knowledge file for a bot; the source is stored 
 
 ## Acceptance criteria
 
-- [ ] Upload creates a Source in `processing`
-- [ ] Job is enqueued for the new source
-- [ ] Upload to a bot outside the user’s tenant is denied
-- [ ] Unsupported / rejected files fail clearly (per decided file types)
+- [x] Upload creates a Source in `processing`
+- [x] Job is enqueued for the new source
+- [x] Upload to a bot outside the user’s tenant is denied
+- [x] Unsupported / rejected files fail clearly (per decided file types)
 
-## Open decisions
+## Decisions
 
-- MVP file types: PDF + TXT, and/or DOCX ([spec §12.1](../../application-spec.md))
+- File types: PDF + TXT + DOCX; max 10 MB
+- Storage: MinIO (S3 API) via Chainguard free image `cgr.dev/chainguard/minio`
+- Cross-tenant / missing bot: HTTP 403
+- Publish failure: leave Source `processing`; `knowledge-recovery` republishes; `knowledge-dlq` marks `failed`
+- Bot list APIs remain VCS-004; this ticket adds bot repo + ownership check only

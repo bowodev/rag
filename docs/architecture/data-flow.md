@@ -44,7 +44,7 @@ sequenceDiagram
   API-->>U: access_token
 ```
 
-## Knowledge upload (P0 — planned)
+## Knowledge upload (P0 — VCS-005)
 
 ```mermaid
 sequenceDiagram

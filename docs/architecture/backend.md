@@ -53,7 +53,13 @@ cmd/consumer/main
       → presenter handler (application / infrastructure work)
 ```
 
-Today a **test** consumer is registered (`IndexSource` job shape). Knowledge indexing consumers plug into the same registry pattern.
+Registered consumers:
+
+- `test` — smoke handler for `IndexSource`
+- `knowledge-recovery` — republish stuck `processing` sources (poll + queue)
+- `knowledge-dlq` — mark Source `failed` when jobs land on `knowledge.index.dlq`
+
+Indexing extract→embed remains VCS-006 (same registry pattern).
 
 ## Persistence
 
@@ -70,9 +76,18 @@ Today a **test** consumer is registered (`IndexSource` job shape). Knowledge ind
 | Piece | Location |
 |-------|----------|
 | Connection (API lifespan) | `infrastructure/rabbitmq/connection.py` |
+| Topology (index + DLX/DLQ + recovery) | `infrastructure/rabbitmq/topology.py` |
 | Publish bus | `infrastructure/rabbitmq/bus.py` (`RabbitMQBus`) |
 | Job DTOs | `domain/dto/jobs.py` |
 | Port | `application/ports/job_bus.py` |
+
+## Object storage
+
+| Piece | Location |
+|-------|----------|
+| Port | `application/ports/object_storage.py` |
+| MinIO / S3 adapter | `infrastructure/storage/s3.py` |
+| Local image | `cgr.dev/chainguard/minio` (free community; see compose) |
 
 ## Auth primitives
 

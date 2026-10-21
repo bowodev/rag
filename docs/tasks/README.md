@@ -60,7 +60,7 @@ VCS-001 schema (bots = metadata only; LLM settings in backend config)
 | [VCS-002](./p0/VCS-002-auth-and-tenant-context.md) | Auth + tenant context | backend | done |
 | [VCS-003](./p0/VCS-003-internal-user-tenant-crud.md) | Internal User + Tenant CRUD | backend | done |
 | [VCS-004](./p0/VCS-004-bots-and-tenants-read-apis.md) | Bots read APIs (metadata only) | backend | todo |
-| [VCS-005](./p0/VCS-005-knowledge-upload-enqueue.md) | Knowledge upload + enqueue | backend | todo |
+| [VCS-005](./p0/VCS-005-knowledge-upload-enqueue.md) | Knowledge upload + enqueue | backend | done |
 | [VCS-006](./p0/VCS-006-knowledge-indexing-consumer.md) | Knowledge indexing consumer | backend | todo |
 | [VCS-007](./p0/VCS-007-knowledge-list-delete.md) | Knowledge list, status, delete | backend | todo |
 | [VCS-008](./p0/VCS-008-playground-chat-rag.md) | Playground chat (RAG) | backend | todo |
@@ -97,7 +97,7 @@ VCS-001 schema (bots = metadata only; LLM settings in backend config)
 
 From [application-spec §12](../application-spec.md):
 
-1. MVP file types: PDF + TXT, or also DOCX?
+1. ~~MVP file types: PDF + TXT, or also DOCX?~~ **Resolved (VCS-005):** PDF + TXT + DOCX (10 MB max)
 2. ~~Vector store: pgvector (proposed) vs Qdrant~~ **Resolved:** pgvector
 3. Dashboard auth: managed vs self-hosted JWT
 4. ~~Bot creation / settings API shape~~ → **Resolved:** no HTTP exposure of LLM settings; bot rows via seed/backend-only for now; internal APIs = User + Tenant CRUD only

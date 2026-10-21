@@ -1,0 +1,17 @@
+# Bos Kodingin handoff (never commit)
+specs/**/WORK_LOG.md
+
+# Common
+.DS_Store
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+.coverage
+htmlcov/

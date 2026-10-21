@@ -14,20 +14,20 @@ System shape for Virtuascope VCS. Product scope stays in [`application-spec.md`]
           ▼
 ┌─────────────────────────────────────┐
 │ Backend API process (FastAPI)       │
-│  auth · me · tenants · (bots…)      │
-│  lifespan: RabbitMQ connection      │
+│  auth · me · tenants · knowledge upload │
+│  lifespan: RabbitMQ + MinIO bucket      │
 └─────────┬───────────────┬───────────┘
           │               │ publish
           │               ▼
           │     ┌─────────────────────┐
           │     │ RabbitMQ            │
-          │     │ durable queues      │
+          │     │ knowledge.index + DLQ │
           │     └──────────┬──────────┘
           │                │ consume
           │                ▼
           │     ┌─────────────────────┐
           │     │ Consumer process(es)│
-          │     │ extract→embed→index │  (knowledge path; test consumer exists)
+          │     │ recovery / DLQ / index │
           │     └──────────┬──────────┘
           ▼                ▼
    ┌──────────────────────────────────┐
@@ -35,10 +35,10 @@ System shape for Virtuascope VCS. Product scope stays in [`application-spec.md`]
    │ domain tables + chunk_embeddings │
    └──────────────────────────────────┘
           ▲
-          │ object storage for raw files (planned with knowledge upload)
+          │ MinIO (S3) raw knowledge files
 ```
 
-Local infra (`docker compose`): **Postgres (pgvector)**, **RabbitMQ**, optional RabbitScout UI.
+Local infra (`docker compose`): **Postgres (pgvector)**, **RabbitMQ**, **MinIO** (Chainguard free image), optional RabbitScout UI.
 
 ## Processes
 
@@ -83,7 +83,8 @@ Do not close long-lived deps while requests may still be using them.
 | Schema + Alembic + pgvector smoke | Done (VCS-001) |
 | Auth + `/me` + membership-scoped tenants | Done (VCS-002) |
 | Internal user/tenant/membership CRUD + set-password | Done (VCS-003) |
-| Bots / knowledge / chat APIs + dashboard UI | Planned (VCS-004…) |
+| Knowledge upload + enqueue (+ recovery/DLQ) | Done (VCS-005) |
+| Bots read / indexing consumer / chat / dashboard | Planned (VCS-004, VCS-006…) |
 | Host chatbot / embed | Deferred (P2) |
 
 Chatbot host integration is **P2** and intentionally omitted from the MVP critical path.

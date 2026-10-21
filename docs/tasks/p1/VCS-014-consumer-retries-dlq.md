@@ -7,6 +7,8 @@
 | App | `backend` |
 | Domains | Knowledge |
 | Depends on | VCS-006 |
+
+> **Note:** VCS-005 already declared `knowledge.index` + DLX/DLQ and shipped a `knowledge-dlq` consumer that marks Source `failed`. This ticket hardens retries / visibility on top of that foundation.
 | Spec refs | roadmap P1; application-spec §5.4 (system processing) |
 
 ## Goal
