@@ -6,16 +6,20 @@ Multi-tenant RAG chatbot platform for the Virtuascope ecosystem.
 
 | App | Path | Notes |
 |-----|------|--------|
-| Backend | `apps/backend` | FastAPI |
-| Dashboard | `apps/dashboard` | React (Virtuascope users) |
-| Chatbot | `apps/chatbot` | React (P2 priority for host embed) |
+| Backend | `apps/backend` | FastAPI API + RabbitMQ consumers |
+| Dashboard | `apps/dashboard` | React (Virtuascope users) — scaffold |
+| Landing | `apps/landing` | Scaffold |
+| Chatbot | `apps/chatbot` | P2 host embed — deferred |
+
+Architecture KB: [`docs/architecture/overview.md`](./docs/architecture/overview.md), backend layers: [`docs/architecture/backend.md`](./docs/architecture/backend.md).
 
 ## Local infrastructure
 
-Postgres + **pgvector** for backend development (`pgvector/pgvector:pg16`):
+Postgres (**pgvector**) + RabbitMQ via Compose:
 
 ```bash
-docker compose up -d postgres
+make infra-up
+# or: docker compose up -d
 ```
 
 See [`apps/backend/README.md`](./apps/backend/README.md) for connection URL and migrations.

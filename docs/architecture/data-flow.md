@@ -1,15 +1,40 @@
 # Data flows
 
-## Knowledge upload
+**Last updated:** 2026-10-21
+
+## Auth + tenant context (implemented)
 
 ```mermaid
 sequenceDiagram
   participant U as VCS User
   participant D as Dashboard
   participant API as Backend API
-  participant Q as Queue
+  participant DB as Postgres
+
+  U->>D: Login
+  D->>API: POST /auth/login
+  API->>DB: Lookup user + verify password_hash
+  API-->>D: access_token + refresh_token
+  D->>API: GET /me (Bearer access)
+  API-->>D: user identity
+  D->>API: GET /tenants (Bearer access)
+  API->>DB: Memberships for user (active tenants)
+  API-->>D: tenant list
+  Note over API: Later tenant-scoped routes<br/>use require_tenant_membership
+```
+
+Refresh: `POST /auth/refresh` exchanges a valid refresh JWT for a new access (+ refresh) pair.
+
+## Knowledge upload (P0 — planned)
+
+```mermaid
+sequenceDiagram
+  participant U as VCS User
+  participant D as Dashboard
+  participant API as Backend API
+  participant Q as RabbitMQ
   participant W as Consumer
-  participant V as Vector DB
+  participant V as Postgres pgvector
 
   U->>D: Upload file
   D->>API: POST /bots/{id}/sources
@@ -24,14 +49,14 @@ sequenceDiagram
   API-->>D: Status
 ```
 
-## Playground chat
+## Playground chat (P0 — planned)
 
 ```mermaid
 sequenceDiagram
   participant U as VCS User
   participant D as Dashboard
   participant API as Backend API
-  participant V as Vector DB
+  participant V as Postgres pgvector
   participant LLM as LLM Provider
 
   U->>D: Send message

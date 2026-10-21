@@ -1,37 +1,70 @@
 # Architecture overview
 
+**Last updated:** 2026-10-21
+
+System shape for Virtuascope VCS. Product scope stays in [`application-spec.md`](../application-spec.md). Backend layering: [`backend.md`](./backend.md).
+
+## Runtime topology
+
 ```text
 ┌────────────────────┐
-│  Dashboard (React) │  Virtuascope users
+│  Dashboard (React) │  Virtuascope users (scaffold — not built yet)
 └─────────┬──────────┘
-          │ JWT / session
+          │ Bearer JWT (access) + refresh
           ▼
 ┌─────────────────────────────────────┐
-│ Backend API (FastAPI)               │
-│  auth · bots · knowledge · chat     │
+│ Backend API process (FastAPI)       │
+│  auth · me · tenants · (bots…)      │
+│  lifespan: RabbitMQ connection      │
 └─────────┬───────────────┬───────────┘
-          │               │ enqueue
+          │               │ publish
           │               ▼
           │     ┌─────────────────────┐
-          │     │ Queue + Consumers   │
-          │     │ extract→embed→index │
+          │     │ RabbitMQ            │
+          │     │ durable queues      │
+          │     └──────────┬──────────┘
+          │                │ consume
+          │                ▼
+          │     ┌─────────────────────┐
+          │     │ Consumer process(es)│
+          │     │ extract→embed→index │  (knowledge path; test consumer exists)
           │     └──────────┬──────────┘
           ▼                ▼
    ┌──────────────────────────────────┐
-   │ Postgres (pgvector)              │
-   │ domains + chunk_embeddings       │
+   │ Postgres 16 + pgvector           │
+   │ domain tables + chunk_embeddings │
    └──────────────────────────────────┘
           ▲
-          │ object storage for raw files
+          │ object storage for raw files (planned with knowledge upload)
 ```
+
+Local infra (`docker compose`): **Postgres (pgvector)**, **RabbitMQ**, optional RabbitScout UI.
+
+## Processes
+
+| Process | Entry | Role |
+|---------|-------|------|
+| **API** | `uvicorn app.cmd.api.main:app` | Sync HTTP, authz, enqueue jobs, RAG orchestration (when built) |
+| **Consumer** | `python -m app.cmd.consumer.main <name>` | Async workers; share domain/application rules with API |
+
+Make targets: `make backend-api`, `make backend-consumer-test`, `make infra-up`.
 
 ## Responsibilities
 
-- **API**: synchronous request/response, authz, enqueue work, RAG chat orchestration
-- **Consumers**: async knowledge processing only
-- **Postgres**: domain persistence (see [`schema.dbml`](./schema.dbml); bots are metadata-only)
+- **API**: request/response, JWT auth, membership checks, enqueue work, playground RAG (P0)
+- **Consumers**: async knowledge processing only (and smoke/test handlers today)
+- **Postgres**: domain persistence — see [`schema.dbml`](./schema.dbml); bots are metadata-only
 - **Backend config**: LLM prompt / model / temperature (RAG in-process; not in Postgres for MVP)
 - **Vector store**: pgvector in the same Postgres instance; `chunk_embeddings` filtered by `tenant_id` + `bot_id` (default dim 1536)
+- **Queue**: RabbitMQ durable queues via `RabbitMQBus` / consumer registry
+
+## Auth (implemented — VCS-002)
+
+- Self-hosted **HS256 JWT**: short-lived **access** + longer-lived **refresh**
+- `POST /auth/login`, `POST /auth/refresh`, `GET /me`, `GET /tenants`
+- `require_auth` → `AuthContext` (user identity)
+- `require_tenant_membership` → fail-closed on tenant path/body ids
+- Details: [`multi-tenancy.md`](./multi-tenancy.md), [`domains/user.md`](../domains/user.md)
 
 ## API process lifecycle
 
@@ -41,5 +74,15 @@ On `SIGTERM` / `SIGINT`, uvicorn:
 2. Runs FastAPI lifespan shutdown — close shared deps (e.g. RabbitMQ) **after** HTTP is done
 
 Do not close long-lived deps while requests may still be using them.
+
+## Implemented vs planned (P0)
+
+| Area | Status |
+|------|--------|
+| Schema + Alembic + pgvector smoke | Done (VCS-001) |
+| Auth + `/me` + membership-scoped tenants | Done (VCS-002) |
+| Internal user/tenant CRUD | Planned (VCS-003) |
+| Bots / knowledge / chat APIs + dashboard UI | Planned (VCS-004…) |
+| Host chatbot / embed | Deferred (P2) |
 
 Chatbot host integration is **P2** and intentionally omitted from the MVP critical path.

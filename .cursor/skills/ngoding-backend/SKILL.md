@@ -28,12 +28,15 @@ Do not write production code before Planning is approved.
 
 ## Stack & layout
 
-- FastAPI + clear layering already present under `apps/backend/app/`:
-  - `api/` — HTTP routers, request/response models
-  - `application/` — use-cases / workflows
-  - `domain/` — entities, invariants (Tenant, User, Bot, Knowledge, Chat)
-  - `infrastructure/` — DB, queue, vector store, LLM, object storage
-  - `core/` — settings, shared utilities
+- FastAPI + clean layering under `apps/backend/app/` (see `docs/architecture/backend.md`):
+  - `cmd/api/` — FastAPI app, routes, deps, errors
+  - `cmd/consumer/` — RabbitMQ consumer registry + runner
+  - `presenter/` — HTTP / event adapters
+  - `middleware/` — auth helpers used by deps
+  - `application/` — use-cases, ports, bootstrap services
+  - `domain/` — DTOs, auth context, domain errors / invariants
+  - `infrastructure/` — DB, JWT, RabbitMQ, vector readiness, (LLM / object storage as added)
+  - `config/` — settings from env
 - Prefer dependency injection at API boundaries; keep routers thin.
 - Domain rules stay in domain/application — not scattered in routers.
 - Consumers/workers for knowledge processing stay separate entrypoints but share domain rules.

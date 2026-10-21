@@ -7,7 +7,7 @@
   "python.analysis.typeCheckingMode": "basic",
   "editor.parameterHints.enabled": true,
   "[python]": {
-    "editor.defaultFormatter": "ms-python.python",
+    "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit"

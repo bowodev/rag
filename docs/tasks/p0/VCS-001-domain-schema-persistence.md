@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| Status | `in_progress` |
+| Status | `done` |
 | Priority | P0 |
 | App | `backend` |
 | Domains | Tenant, User, Bot, Knowledge, Chat |
@@ -42,23 +42,23 @@ MVP LLM settings (prompt / model / temperature) live in **backend config** (env 
 
 1. **Lock vector store choice** — ~~decide pgvector vs Qdrant~~ **done: pgvector**
 2. **DB tooling** — ~~Postgres wiring + migration tool (e.g. Alembic) on empty DB~~ **done**
-3. **Enums + base models** — shared types / timestamps; no LLM settings on bots
-4. **Identity tables** — `tenants`, `users`, `memberships` (+ unique `tenant_id+user_id`)
-5. **Bot metadata table** — `bots` (`id`, `tenant_id`, `name`, `status` only)
-6. **Knowledge tables** — `sources`, `chunks` (`tenant_id` + `bot_id`, source status enum, `vector_id` pointer)
-7. **Chat tables** — `conversations`, `messages` (+ optional `citations` jsonb)
-8. **Constraints / indexes** — FK ownership bot→tenant; indexes for tenant/bot scoped queries
-9. **Vector store init** — ~~pgvector extension + `chunk_embeddings` with `tenant_id` + `bot_id`~~ **done** (FK to `chunks` deferred until subtask 6)
-10. **Smoke verify** — migrations apply cleanly; models import; vector store reachable (no APIs yet) — partial (vector side)
+3. **Enums + base models** — ~~shared types / timestamps; no LLM settings on bots~~ **done** (`app/infrastructure/database/enum.py`, `base.py`)
+4. **Identity tables** — ~~`tenants`, `users`, `memberships` (+ unique `tenant_id+user_id`)~~ **done**
+5. **Bot metadata table** — ~~`bots` (`id`, `tenant_id`, `name`, `status` only)~~ **done**
+6. **Knowledge tables** — ~~`sources`, `chunks` (`tenant_id` + `bot_id`, source status enum, `vector_id` pointer)~~ **done**
+7. **Chat tables** — ~~`conversations`, `messages` (+ optional `citations` jsonb)~~ **done**
+8. **Constraints / indexes** — ~~FK ownership bot→tenant; indexes for tenant/bot scoped queries~~ **done**
+9. **Vector store init** — ~~pgvector extension + `chunk_embeddings` with `tenant_id` + `bot_id`~~ **done** (FK `chunk_id` → `chunks.id` in migration `001`)
+10. **Smoke verify** — ~~migrations apply cleanly; models import; vector store reachable (no APIs yet)~~ **done** (`alembic upgrade head`, `tests/test_vcs001_smoke.py`)
 
 ## Acceptance criteria
 
-- [ ] Schema covers all MVP domain entities from the spec / DBML
-- [ ] Every tenant-owned row can be filtered by `tenant_id`
-- [ ] Knowledge and Chat rows are owned via `bot_id` (bot owned by tenant)
-- [ ] `bots` has **no** LLM settings columns
-- [ ] Source status enum supports `processing` | `ready` | `failed`
-- [ ] Migrations apply cleanly on empty DB
+- [x] Schema covers all MVP domain entities from the spec / DBML
+- [x] Every tenant-owned row can be filtered by `tenant_id`
+- [x] Knowledge and Chat rows are owned via `bot_id` (bot owned by tenant)
+- [x] `bots` has **no** LLM settings columns
+- [x] Source status enum supports `processing` | `ready` | `failed`
+- [x] Migrations apply cleanly on empty DB
 - [x] Vector store is initialized and ready for later upsert (VCS-006)
 
 ## Open decisions

@@ -17,5 +17,36 @@ services:
       timeout: 5s
       retries: 5
 
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: vcs-rabbitmq
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # management UI (built-in)
+    environment:
+      RABBITMQ_DEFAULT_USER: vcs
+      RABBITMQ_DEFAULT_PASS: vcs
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Modern RabbitMQ dashboard (KafkaUI-like). Login with RabbitMQ creds (vcs/vcs).
+  rabbitscout:
+    image: ghcr.io/ralve-org/rabbitscout:latest
+    container_name: vcs-rabbitscout
+    ports:
+      - "15673:3000"
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 15672
+      RABBITMQ_PROTOCOL: http
+      COOKIE_SECURE: "false"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   vcs_postgres_data:
