@@ -8,3 +8,11 @@ class UnauthorizedError(Exception):
 
 class ForbiddenError(Exception):
     """Base forbidden error."""
+
+
+class NotFoundError(Exception):
+    """Resource not found."""
+
+
+class ConflictError(Exception):
+    """Conflict (unique constraint, ineligible state, dependent rows)."""

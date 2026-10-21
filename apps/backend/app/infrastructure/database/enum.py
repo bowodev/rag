@@ -14,6 +14,11 @@ class MembershipRole(StrEnum):
     MEMBER = "member"
     OWNER = "owner"
 
+
+class PlatformRole(StrEnum):
+    USER = "user"
+    OPS = "ops"
+
 class BotStatus(StrEnum):
     DRAFT = "draft"
     LIVE = "live"

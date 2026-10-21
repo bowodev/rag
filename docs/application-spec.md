@@ -1,8 +1,8 @@
 # Virtuascope VCS — Application Spec
 
-**Status:** Locked (v0.4)  
+**Status:** Locked (v0.5)  
 **Language:** English  
-**Last updated:** 2026-10-05
+**Last updated:** 2026-10-21
 
 ---
 
@@ -84,6 +84,10 @@ Organization boundary. All resources require `tenant_id`.
 
 Dashboard identity. Linked to tenants via **Membership** + role (`owner` / `admin` / `member`).
 
+Platform role: `user` (default) or `ops`. Only `ops` may call `/internal/*` after normal login.
+
+`password_hash` may be null at create time; the user sets a password via `POST /auth/set-password` before they can log in.
+
 ### 5.3 Bot
 
 Deployable chatbot unit. Settings (prompt, model, temperature) are **backend-private** — never returned or accepted on HTTP APIs. Dashboard may list bots and status only; it must not edit or display LLM settings.
@@ -139,7 +143,7 @@ Out of P0 critical path. Keep scaffold-friendly; full embed/host UX is P2.
 
 ### Provision
 
-Operator creates tenant + user (+ membership) via internal CRUD → bots exist via seed/backend-only provisioning with private LLM settings → user sees bot metadata in dashboard.
+Operator (`ops`) creates tenant + user (+ membership) via internal CRUD (password optional) → user calls `POST /auth/set-password` if hash was null → bots exist via seed/backend-only provisioning with private LLM settings → user sees bot metadata in dashboard.
 
 ### Knowledge
 
@@ -169,7 +173,8 @@ User sends message → persist → retrieve chunks (`tenant_id` + `bot_id`, read
 ```
 Auth
   POST /auth/login
-  POST /auth/refresh      # exchange refresh JWT for new access (+ refresh) tokens
+  POST /auth/refresh        # exchange refresh JWT for new access (+ refresh) tokens
+  POST /auth/set-password   # { email, password } — only when password_hash is null
   GET  /me
 
 Tenants
@@ -190,21 +195,24 @@ Chat
   GET  /bots/{id}/conversations              # optional
   GET  /conversations/{id}/messages          # optional
 
-Internal (User + Tenant only)
-  CRUD /internal/tenants
-  CRUD /internal/users
-  CRUD /internal/memberships
+Internal (User + Tenant only; require platform_role=ops JWT)
+  CRUD + list/filter /internal/tenants
+  CRUD + list/filter /internal/users      # password optional on create; never return password_hash
+  CRUD + list/filter /internal/memberships
 
 # Explicitly NOT in current P0 API surface:
 #   POST  /internal/bots
 #   PATCH /internal/bots/{id}/settings
+#   authenticated change-password when hash already set
 ```
 
 ---
 
 ## 10. Acceptance criteria (P0)
 
-- [ ] Operator can CRUD users + tenants (and memberships) via internal path
+- [ ] Operator (`platform_role=ops`) can CRUD + list/filter users, tenants, and memberships via `/internal/*`
+- [ ] Non-ops callers cannot use `/internal/*`
+- [ ] User with null password_hash can set password via `/auth/set-password` then login
 - [ ] Dashboard user only sees bots in their tenant(s)
 - [ ] Upload file → status becomes `ready` (or visible `failed`)
 - [ ] Delete file → content no longer used in answers
@@ -240,3 +248,5 @@ Anticipated rules (do not implement in P0 unless explicitly requested):
 3. ~~Dashboard auth: managed vs self-hosted JWT~~ **Resolved (VCS-002):** self-hosted HS256 JWT (access + refresh); managed IdP deferred
 4. ~~Bot creation: internal-only vs “request bot”?~~ **Resolved (v0.4):** no HTTP bot/LLM-settings APIs in current P0; bots via seed/backend-only; internal APIs = User + Tenant CRUD; LLM settings never exposed
 5. Failed-source reprocess: P0 or P1?
+6. ~~Internal ops auth~~ **Resolved (VCS-003):** same login JWT; `users.platform_role = ops` + `require_ops`
+7. ~~Password provisioning~~ **Resolved (VCS-003):** ops may create users with null hash; self-serve `POST /auth/set-password` (first-time only)

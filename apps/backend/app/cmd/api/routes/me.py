@@ -10,4 +10,8 @@ router = APIRouter(tags=["auth"])
 
 @router.get("/me")
 async def me(ctx: Annotated[AuthContext, Depends(require_auth)]):
-    return MeResponse(user_id=ctx.user_id, email=ctx.email)
+    return MeResponse(
+        user_id=ctx.user_id,
+        email=ctx.email,
+        platform_role=ctx.platform_role,
+    )

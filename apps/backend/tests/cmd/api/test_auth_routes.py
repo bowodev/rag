@@ -31,7 +31,7 @@ def test_me_requires_auth() -> None:
 def test_me_with_valid_access_token() -> None:
     user_id = uuid4()
     token = create_access_token(user_id=user_id)
-    ctx = AuthContext(user_id=user_id, email="a@example.com")
+    ctx = AuthContext(user_id=user_id, email="a@example.com", platform_role="user")
 
     async def fake_require_auth():  # noqa: ANN202
         return ctx
@@ -51,6 +51,7 @@ def test_me_with_valid_access_token() -> None:
                 assert res.status_code == 200
                 assert res.json()["email"] == "a@example.com"
                 assert res.json()["user_id"] == str(user_id)
+                assert res.json()["platform_role"] == "user"
         finally:
             app.dependency_overrides.clear()
 
@@ -65,7 +66,7 @@ def test_tenants_requires_auth() -> None:
 def test_tenants_returns_membership_list() -> None:
     user_id = uuid4()
     tenant_id = uuid4()
-    ctx = AuthContext(user_id=user_id, email="a@example.com")
+    ctx = AuthContext(user_id=user_id, email="a@example.com", platform_role="user")
 
     async def fake_require_auth():  # noqa: ANN202
         return ctx

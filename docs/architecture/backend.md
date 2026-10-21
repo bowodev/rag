@@ -40,8 +40,9 @@ Example (auth):
 
 Protected routes use FastAPI deps in `cmd/api/deps/auth.py`:
 
-- `require_auth` — Bearer access JWT → `AuthContext`
+- `require_auth` — Bearer access JWT → `AuthContext` (includes `platform_role`)
 - `require_tenant_membership` — membership check for a given `tenant_id`
+- `require_ops` — `platform_role == ops` for `/internal/*`
 
 ## Consumer path (queue)
 
@@ -80,8 +81,9 @@ Today a **test** consumer is registered (`IndexSource` job shape). Knowledge ind
 | JWT encode/decode | `infrastructure/auth/jwt.py` |
 | Login / refresh use-cases | `application/auth/` |
 | Password hashing | `application/auth/password_helper.py` |
-| `AuthContext` / login DTOs | `domain/auth/` |
+| `AuthContext` / login / set-password DTOs | `domain/auth/` |
 | Token → user | `middleware/auth.py` + `cmd/api/deps/auth.py` |
+| Internal CRUD (ops) | `cmd/api/routes/internal/*` + matching presenters / use-cases |
 
 ## Conventions
 

@@ -58,12 +58,13 @@ Make targets: `make backend-api`, `make backend-consumer-test`, `make infra-up`.
 - **Vector store**: pgvector in the same Postgres instance; `chunk_embeddings` filtered by `tenant_id` + `bot_id` (default dim 1536)
 - **Queue**: RabbitMQ durable queues via `RabbitMQBus` / consumer registry
 
-## Auth (implemented — VCS-002)
+## Auth (VCS-002 done; VCS-003 extends)
 
 - Self-hosted **HS256 JWT**: short-lived **access** + longer-lived **refresh**
-- `POST /auth/login`, `POST /auth/refresh`, `GET /me`, `GET /tenants`
-- `require_auth` → `AuthContext` (user identity)
+- `POST /auth/login`, `POST /auth/refresh`, `POST /auth/set-password` (first-time), `GET /me`, `GET /tenants`
+- `require_auth` → `AuthContext` (user identity + `platform_role`)
 - `require_tenant_membership` → fail-closed on tenant path/body ids
+- `require_ops` → `/internal/*` only when `platform_role = ops`
 - Details: [`multi-tenancy.md`](./multi-tenancy.md), [`domains/user.md`](../domains/user.md)
 
 ## API process lifecycle
@@ -81,7 +82,7 @@ Do not close long-lived deps while requests may still be using them.
 |------|--------|
 | Schema + Alembic + pgvector smoke | Done (VCS-001) |
 | Auth + `/me` + membership-scoped tenants | Done (VCS-002) |
-| Internal user/tenant CRUD | Planned (VCS-003) |
+| Internal user/tenant/membership CRUD + set-password | Done (VCS-003) |
 | Bots / knowledge / chat APIs + dashboard UI | Planned (VCS-004…) |
 | Host chatbot / embed | Deferred (P2) |
 

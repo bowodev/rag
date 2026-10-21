@@ -58,7 +58,7 @@ VCS-001 schema (bots = metadata only; LLM settings in backend config)
 |----|-------|-----|--------|
 | [VCS-001](./p0/VCS-001-domain-schema-persistence.md) | Domain schema & persistence | backend | done |
 | [VCS-002](./p0/VCS-002-auth-and-tenant-context.md) | Auth + tenant context | backend | done |
-| [VCS-003](./p0/VCS-003-internal-user-tenant-crud.md) | Internal User + Tenant CRUD | backend | todo |
+| [VCS-003](./p0/VCS-003-internal-user-tenant-crud.md) | Internal User + Tenant CRUD | backend | done |
 | [VCS-004](./p0/VCS-004-bots-and-tenants-read-apis.md) | Bots read APIs (metadata only) | backend | todo |
 | [VCS-005](./p0/VCS-005-knowledge-upload-enqueue.md) | Knowledge upload + enqueue | backend | todo |
 | [VCS-006](./p0/VCS-006-knowledge-indexing-consumer.md) | Knowledge indexing consumer | backend | todo |

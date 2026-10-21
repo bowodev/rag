@@ -1,11 +1,16 @@
 from typing import Annotated
 
 from app.application.auth.bootstrap import AuthService
-from app.domain.auth.login import LoginRequest, LoginResponse, RefreshRequest
+from app.domain.auth.login import (
+    LoginRequest,
+    LoginResponse,
+    RefreshRequest,
+    SetPasswordRequest,
+)
 from app.infrastructure.database.repository.user import UserRepository
 from app.infrastructure.database.session import get_session
 from app.presenter.auth_http_handler import AuthHTTPHandler
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(
@@ -36,3 +41,12 @@ async def refresh(
     handler: Annotated[AuthHTTPHandler, Depends(get_auth_handler)],
 ):
     return await handler.refresh(refresh_token=request.refresh_token)
+
+
+@router.post("/set-password", status_code=status.HTTP_204_NO_CONTENT)
+async def set_password(
+    request: SetPasswordRequest,
+    handler: Annotated[AuthHTTPHandler, Depends(get_auth_handler)],
+):
+    await handler.set_password(email=request.email, password=request.password)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

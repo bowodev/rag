@@ -19,7 +19,7 @@ class FakeRepo:
 
 @pytest.mark.asyncio
 async def test_require_tenant_membership_denies_without_membership() -> None:
-    ctx = AuthContext(user_id=uuid4(), email="a@example.com")
+    ctx = AuthContext(user_id=uuid4(), email="a@example.com", platform_role="user")
     with patch(
         "app.cmd.api.deps.auth.MembershipRepository",
         return_value=FakeRepo(allowed=False),
@@ -35,7 +35,7 @@ async def test_require_tenant_membership_denies_without_membership() -> None:
 
 @pytest.mark.asyncio
 async def test_require_tenant_membership_allows_member() -> None:
-    ctx = AuthContext(user_id=uuid4(), email="a@example.com")
+    ctx = AuthContext(user_id=uuid4(), email="a@example.com", platform_role="user")
     with patch(
         "app.cmd.api.deps.auth.MembershipRepository",
         return_value=FakeRepo(allowed=True),

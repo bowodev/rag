@@ -6,6 +6,7 @@ from app.application.ports.user import IUserService
 from app.cmd.api.errors import api_error
 from app.domain.auth.context import AuthContext
 from app.infrastructure.auth.jwt import decode_access_token
+from app.infrastructure.database.enum import PlatformRole
 
 
 class AuthMiddleware:
@@ -38,4 +39,11 @@ class AuthMiddleware:
                 error="invalid token",
             )
 
-        return AuthContext(user_id=user.id, email=user.email)
+        role = getattr(user, "platform_role", PlatformRole.USER)
+        role_value = role.value if isinstance(role, PlatformRole) else str(role)
+
+        return AuthContext(
+            user_id=user.id,
+            email=user.email,
+            platform_role=role_value,
+        )

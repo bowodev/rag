@@ -1,11 +1,11 @@
 from dataclasses import dataclass
-from uuid import UUID
+from uuid import UUID, uuid4
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.ports.membership import IMembershipRepo
-from app.infrastructure.database.enum import TenantStatus
+from app.infrastructure.database.enum import MembershipRole, TenantStatus
 from app.infrastructure.database.model.membership import Membership
 from app.infrastructure.database.model.tenant import Tenant
 
@@ -64,3 +64,66 @@ class MembershipRepository(IMembershipRepo):
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none() is not None
+
+    async def get_by_id(self, membership_id: UUID) -> Membership | None:
+        return await self._session.get(Membership, membership_id)
+
+    async def list(
+        self,
+        *,
+        tenant_id: UUID | None = None,
+        user_id: UUID | None = None,
+    ) -> list[Membership]:
+        stmt = select(Membership)
+        if tenant_id is not None:
+            stmt = stmt.where(Membership.tenant_id == tenant_id)
+        if user_id is not None:
+            stmt = stmt.where(Membership.user_id == user_id)
+        stmt = stmt.order_by(Membership.created_at)
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def create(
+        self,
+        *,
+        tenant_id: UUID,
+        user_id: UUID,
+        role: MembershipRole,
+    ) -> Membership:
+        membership = Membership(
+            id=uuid4(),
+            tenant_id=tenant_id,
+            user_id=user_id,
+            role=role,
+        )
+        self._session.add(membership)
+        await self._session.flush()
+        return membership
+
+    async def update_role(
+        self,
+        membership: Membership,
+        *,
+        role: MembershipRole,
+    ) -> Membership:
+        membership.role = role
+        await self._session.flush()
+        return membership
+
+    async def delete(self, membership: Membership) -> None:
+        await self._session.delete(membership)
+        await self._session.flush()
+
+    async def delete_for_user(self, *, user_id: UUID) -> int:
+        result = await self._session.execute(
+            delete(Membership).where(Membership.user_id == user_id)
+        )
+        await self._session.flush()
+        return int(result.rowcount or 0)
+
+    async def delete_for_tenant(self, *, tenant_id: UUID) -> int:
+        result = await self._session.execute(
+            delete(Membership).where(Membership.tenant_id == tenant_id)
+        )
+        await self._session.flush()
+        return int(result.rowcount or 0)

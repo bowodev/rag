@@ -25,6 +25,25 @@ sequenceDiagram
 
 Refresh: `POST /auth/refresh` exchanges a valid refresh JWT for a new access (+ refresh) pair.
 
+## Provision + set password (VCS-003 — implemented)
+
+```mermaid
+sequenceDiagram
+  participant Ops as Ops user
+  participant API as Backend API
+  participant U as New user
+  participant DB as Postgres
+
+  Ops->>API: POST /auth/login (platform_role=ops)
+  API-->>Ops: access_token
+  Ops->>API: POST /internal/tenants (+ users, memberships)
+  API->>DB: Create tenant/user (password_hash null OK)
+  U->>API: POST /auth/set-password {email, password}
+  API->>DB: Set hash only if currently null
+  U->>API: POST /auth/login
+  API-->>U: access_token
+```
+
 ## Knowledge upload (P0 — planned)
 
 ```mermaid

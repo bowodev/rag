@@ -4,6 +4,7 @@ from uuid import UUID
 from app.application.user.bootstrap import UserService
 from app.cmd.api.errors import api_error
 from app.domain.auth.context import AuthContext
+from app.infrastructure.database.enum import PlatformRole
 from app.infrastructure.database.repository.membership import MembershipRepository
 from app.infrastructure.database.repository.user import UserRepository
 from app.infrastructure.database.session import get_session
@@ -27,6 +28,18 @@ async def require_auth(
         user_service=UserService(user_repo=UserRepository(session)),
     )
     return await auth(token)
+
+
+async def require_ops(
+    ctx: Annotated[AuthContext, Depends(require_auth)],
+) -> AuthContext:
+    if ctx.platform_role != PlatformRole.OPS.value:
+        raise api_error(
+            status.HTTP_403_FORBIDDEN,
+            message="failed to authorize",
+            error="ops access denied",
+        )
+    return ctx
 
 
 async def require_tenant_membership(

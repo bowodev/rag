@@ -6,3 +6,4 @@ from uuid import UUID
 class AuthContext:
     user_id: UUID
     email: str
+    platform_role: str  # "user" | "ops"

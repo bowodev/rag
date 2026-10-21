@@ -3,7 +3,7 @@ from fastapi import status
 from app.application.ports.auth import IAuthService
 from app.cmd.api.errors import api_error
 from app.domain.auth.login import LoginResponse
-from app.domain.errors import UnauthorizedError, ValidationError
+from app.domain.errors import ConflictError, UnauthorizedError, ValidationError
 
 
 class AuthHTTPHandler:
@@ -51,5 +51,27 @@ class AuthHTTPHandler:
             raise api_error(
                 status.HTTP_500_INTERNAL_SERVER_ERROR,
                 message="failed to refresh token",
+                error="an unexpected error occurred",
+            ) from e
+
+    async def set_password(self, *, email: str, password: str) -> None:
+        try:
+            await self._auth_service.set_password(email=email, password=password)
+        except ValidationError as e:
+            raise api_error(
+                status.HTTP_400_BAD_REQUEST,
+                message="failed to set password",
+                error=str(e) or "validation failed",
+            ) from e
+        except ConflictError as e:
+            raise api_error(
+                status.HTTP_409_CONFLICT,
+                message="failed to set password",
+                error=str(e) or "password cannot be set",
+            ) from e
+        except Exception as e:
+            raise api_error(
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+                message="failed to set password",
                 error="an unexpected error occurred",
             ) from e
