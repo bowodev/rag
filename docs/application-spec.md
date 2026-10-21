@@ -169,10 +169,11 @@ User sends message → persist → retrieve chunks (`tenant_id` + `bot_id`, read
 ```
 Auth
   POST /auth/login
+  POST /auth/refresh      # exchange refresh JWT for new access (+ refresh) tokens
   GET  /me
 
 Tenants
-  GET  /tenants
+  GET  /tenants           # membership-scoped; active tenants only
 
 Bots
   GET  /bots
@@ -236,6 +237,6 @@ Anticipated rules (do not implement in P0 unless explicitly requested):
 
 1. MVP file types: PDF + TXT, or also DOCX?
 2. ~~Vector store: pgvector (proposed) vs Qdrant~~ **Resolved:** pgvector (same Postgres instance; `chunk_embeddings` + `tenant_id`/`bot_id` filters)
-3. Dashboard auth: managed vs self-hosted JWT
+3. ~~Dashboard auth: managed vs self-hosted JWT~~ **Resolved (VCS-002):** self-hosted HS256 JWT (access + refresh); managed IdP deferred
 4. ~~Bot creation: internal-only vs “request bot”?~~ **Resolved (v0.4):** no HTTP bot/LLM-settings APIs in current P0; bots via seed/backend-only; internal APIs = User + Tenant CRUD; LLM settings never exposed
 5. Failed-source reprocess: P0 or P1?

@@ -12,6 +12,8 @@ Define the organization boundary and multi-tenant isolation root.
 
 - Every business resource references a `tenant_id`
 - Cross-tenant reads/writes are forbidden
+- `GET /tenants` returns only tenants where the caller has membership (active tenants)
+- Path/body `tenant_id` must pass `require_tenant_membership` before use
 
 ## Out of scope
 
