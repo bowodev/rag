@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     knowledge_recovery_interval_seconds: float = 60.0
     knowledge_recovery_min_age_seconds: float = 30.0
     embedding_dimension: int = 1536
+    openai_api_key: str = ""
+    embedding_model: str = "text-embedding-3-small"
+    chunk_size_chars: int = 1000
+    chunk_overlap_chars: int = 150
     jwt_secret: str = "change-me"  # wajib override di .env
     jwt_algorithm: str = "HS256"
     jwt_ttl_seconds: int = 3600

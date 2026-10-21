@@ -8,6 +8,7 @@ from app.config.config import settings
 from app.domain.dto.jobs import IndexSource, RecoveryTick
 from app.presenter.knowledge_event_handler import (
     knowledge_dlq_handler,
+    knowledge_index_handler,
     knowledge_recovery_handler,
 )
 from app.presenter.test_event_handler import test_event_handler
@@ -32,6 +33,13 @@ CONSUMERS: dict[str, ConsumerSpec] = {
         queue_name="test",
         model=IndexSource,
         presenter=test_event_handler,
+    ),
+    "knowledge-index": ConsumerSpec(
+        name="knowledge-index",
+        queue_name=settings.knowledge_queue,
+        model=IndexSource,
+        presenter=knowledge_index_handler,
+        declare_knowledge_topology=True,
     ),
     "knowledge-dlq": ConsumerSpec(
         name="knowledge-dlq",

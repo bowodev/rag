@@ -88,3 +88,22 @@ class SourceRepository(ISourceRepo):
         source.error_message = error_message
         await self._session.flush()
         return source
+
+    async def mark_ready(
+        self,
+        *,
+        source_id: UUID,
+        tenant_id: UUID,
+        bot_id: UUID,
+    ) -> Source | None:
+        source = await self.get_by_id(
+            source_id=source_id,
+            tenant_id=tenant_id,
+            bot_id=bot_id,
+        )
+        if source is None:
+            return None
+        source.status = SourceStatus.READY
+        source.error_message = None
+        await self._session.flush()
+        return source

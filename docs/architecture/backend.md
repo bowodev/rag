@@ -56,10 +56,9 @@ cmd/consumer/main
 Registered consumers:
 
 - `test` — smoke handler for `IndexSource`
+- `knowledge-index` — extract → chunk → embed → upsert; mark Source `ready` / `failed`
 - `knowledge-recovery` — republish stuck `processing` sources (poll + queue)
 - `knowledge-dlq` — mark Source `failed` when jobs land on `knowledge.index.dlq`
-
-Indexing extract→embed remains VCS-006 (same registry pattern).
 
 ## Persistence
 
@@ -85,8 +84,9 @@ Indexing extract→embed remains VCS-006 (same registry pattern).
 
 | Piece | Location |
 |-------|----------|
-| Port | `application/ports/object_storage.py` |
+| Port | `application/ports/object_storage.py` (`put` / `get` / `delete`) |
 | MinIO / S3 adapter | `infrastructure/storage/s3.py` |
+| Extract / chunk / embed | `infrastructure/knowledge/` |
 | Local image | `cgr.dev/chainguard/minio` (free community; see compose) |
 
 ## Auth primitives

@@ -17,6 +17,7 @@ help:
 	@echo "  make backend-install   Install Python deps (uv)"
 	@echo "  make backend-api       Run FastAPI (reload)"
 	@echo "  make backend-consumer-test       Run test consumer"
+	@echo "  make backend-consumer-index      Run knowledge indexing consumer"
 	@echo "  make backend-consumer-dlq        Run knowledge DLQ consumer"
 	@echo "  make backend-consumer-recovery   Run stuck-source recovery consumer"
 	@echo "  make backend-consumer-list       List available consumers"
@@ -43,6 +44,9 @@ backend-api:
 
 backend-consumer-test:
 	cd $(BACKEND_DIR) && uv run python -m app.cmd.consumer.main test
+
+backend-consumer-index:
+	cd $(BACKEND_DIR) && uv run python -m app.cmd.consumer.main knowledge-index
 
 backend-consumer-dlq:
 	cd $(BACKEND_DIR) && uv run python -m app.cmd.consumer.main knowledge-dlq

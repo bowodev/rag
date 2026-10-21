@@ -66,6 +66,12 @@ class S3ObjectStorage:
                 ContentType=content_type,
             )
 
+    async def get(self, *, key: str) -> bytes:
+        async with self._session.client(**self._client_kwargs()) as client:
+            response = await client.get_object(Bucket=self._bucket, Key=key)
+            body = response["Body"]
+            return await body.read()
+
     async def delete(self, *, key: str) -> None:
         async with self._session.client(**self._client_kwargs()) as client:
             await client.delete_object(Bucket=self._bucket, Key=key)

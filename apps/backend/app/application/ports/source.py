@@ -58,3 +58,11 @@ class ISourceRepo(Protocol):
         bot_id: UUID,
         error_message: str,
     ) -> SourceRecord | None: ...
+
+    async def mark_ready(
+        self,
+        *,
+        source_id: UUID,
+        tenant_id: UUID,
+        bot_id: UUID,
+    ) -> SourceRecord | None: ...
